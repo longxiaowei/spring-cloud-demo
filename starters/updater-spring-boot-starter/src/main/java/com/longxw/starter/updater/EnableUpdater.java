@@ -1,4 +1,4 @@
-package com.longxw.demo.updater;
+package com.longxw.starter.updater;
 
 import org.springframework.context.annotation.Import;
 
@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(SQLUpdaterConfiguration.class)
+@Import(UpdaterConfiguration.class)
 @Documented
-public @interface EnableAutoUpdateSQL {
+public @interface EnableUpdater {
 }

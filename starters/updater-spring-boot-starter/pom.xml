@@ -10,6 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>updater-spring-boot-starter</artifactId>
-
+    <packaging>jar</packaging>
 
 </project>
