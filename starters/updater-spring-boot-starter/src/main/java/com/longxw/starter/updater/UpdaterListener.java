@@ -65,16 +65,6 @@ public class UpdaterListener implements ApplicationListener<ContextRefreshedEven
         }
     }
 
-    /**执行 sql
-     * @author longxw
-     * @since 2019-8-12
-     */
-    private void excutorSql(Connection connection,String sql) throws SQLException{
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.executeQuery();
-        preparedStatement.close();
-    }
-
     /** 获取符合条件的 sql
      * @author longxw
      * @since 2019-8-12
