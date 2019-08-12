@@ -1,0 +1,23 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: config-jdbc
+  cloud:
+    config:
+      server:
+        jdbc:
+          sql: select code AS 'KEY', config AS 'VALUE' from sc_config where APPLICATION=? and PROFILE=? and LABEL=?
+        label: master
+    refresh:
+      extra-refreshable: none
+
+  profiles:
+    active: jdbc
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/scdemo?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver

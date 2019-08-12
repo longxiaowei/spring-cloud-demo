@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: sc-gateway
+  cloud:
+    consul:
+      host: 127.0.0.1    # consul 启动地址
+      port: 8500         # consul 启动端口
+      discovery:
+        tag: tag3
+        register-health-check: false
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: consumer-router
+        uri: lb://consul-consumer
+        predicates:
+          - Path=/hello
+
+
+server:
+  port: 9000

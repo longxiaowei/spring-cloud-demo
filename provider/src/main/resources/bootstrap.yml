@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: consul-provider
+  cloud:
+    consul:
+      host: 127.0.0.1    # consul 启动地址
+      port: 8500         # consul 启动端口
+      discovery:
+        tag: tag2
+        register-health-check: false
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    sender: web
+    sleuth:
+      sampler:
+        probability: 1 # 采样率 默认 0.1 即百分之10
+server:
+  port: 8800

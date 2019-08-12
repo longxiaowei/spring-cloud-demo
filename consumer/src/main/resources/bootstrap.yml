@@ -1,0 +1,32 @@
+spring:
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    sender: web
+  sleuth:
+    sampler:
+      probability: 1 # 采样率 默认 0.1 即百分之10
+  application:
+    name: consul-consumer
+  cloud:
+    consul:
+      host: localhost    # consul 启动地址
+      port: 8500         # consul 启动端口
+      discovery:
+        tag: tag2
+        register-health-check: false
+    #config:
+    #  uri: http://127.0.0.1:9090/
+    #  profile: default
+    #  label: master
+server:
+  port: 8111
+
+
+feign:
+  hystrix:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
