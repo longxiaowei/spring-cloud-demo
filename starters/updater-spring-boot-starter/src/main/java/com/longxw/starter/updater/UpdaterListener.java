@@ -1,19 +1,23 @@
 package com.longxw.starter.updater;
 
+import com.longxw.starter.updater.tool.DbTool;
+import com.longxw.starter.updater.tool.FileTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class UpdaterListener implements ApplicationListener<ContextRefreshedEvent> {
-
     @Autowired
     UpdaterDataSourceProperties updaterDataSourceProperties;
 
@@ -27,15 +31,26 @@ public class UpdaterListener implements ApplicationListener<ContextRefreshedEven
         Connection connection = null;
         try {
             connection = getConnection(applicationContext);
-            PreparedStatement preparedStatement = connection.prepareStatement("select '1' from dual");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                log.debug("测试 sql 版本控制器" + (String)resultSet.getObject(1));
+            DbTool dbTool = new DbTool(connection);
+            String version = (String)dbTool.executeQuery("select v_updater from updater_version").getObject(1);
+            Map<String,String> map = getScript(version);
+            String lastVersion = null;
+            for(String key : map.keySet()){
+                String[] sqls = map.get(key).split(";");
+                for(String sql : sqls){
+                    try {
+                        dbTool.executeUpdate(sql);
+                        lastVersion = key;
+                    }catch (Exception e){
+
+                    }
+
+                }
             }
-            List<String> list = getScript();
-            for(String sql : list){
-                excutorSql(connection,sql);
+            if(lastVersion == null){
+                return;
             }
+            dbTool.executeUpdate("update updater_version set version = ?",new String[]{lastVersion});//更新版本信息
         }catch (SQLException e){
 
         }finally {
@@ -64,8 +79,23 @@ public class UpdaterListener implements ApplicationListener<ContextRefreshedEven
      * @author longxw
      * @since 2019-8-12
      */
-    private List<String> getScript(){
-        return new ArrayList<>();
+    private Map<String,String> getScript(String version) {
+        try {
+            URL url = ResourceUtils.getURL("classpath:script/sql");
+            File sqlDir = new File(url.getPath()).getCanonicalFile();
+            File[] files = sqlDir.listFiles();
+            List<File> fileList = Arrays.stream(files)
+                    .filter(file -> compareVersion(file.getName(),version)>0 )
+                    .collect(Collectors.toList());
+            Map<String,String> map = new TreeMap();
+            fileList.forEach( file -> {
+                map.put(file.getName(),FileTool.readText(file));
+            });
+            return map;
+        }catch (Exception e){
+            e.printStackTrace();
+            return new TreeMap();
+        }
     }
 
     private Connection getConnection(ApplicationContext applicationContext) throws SQLException{
@@ -74,5 +104,11 @@ public class UpdaterListener implements ApplicationListener<ContextRefreshedEven
             return DriverManager.getConnection(updaterDataSourceProperties.getUrl(), updaterDataSourceProperties.getUsername(), updaterDataSourceProperties.getPassword());
         }
         return applicationContext.getBean(DataSource.class).getConnection();
+    }
+
+    private int compareVersion(String t1,String t2){
+        int result = t1.compareTo(t2);
+        log.debug("{} compare to {} is {}", t1, t2, result);
+        return result;
     }
 }
