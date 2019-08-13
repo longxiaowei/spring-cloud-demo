@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class DemoController {
     @RequestMapping(value = "/search/repositories", method = RequestMethod.GET)
     public String searchRepo(){
-        log.info("com in consul-provider Method:searchRepo");
+        log.info("come in consul-provider Method:searchRepo");
         return "success";
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public String test(){
-        log.info("com in consul-provider Method:test");
+        log.info("come in consul-provider Method:test");
         throw new RuntimeException("需要妹子救命");
     }
 
