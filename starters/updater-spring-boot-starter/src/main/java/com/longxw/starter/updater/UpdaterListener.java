@@ -81,7 +81,7 @@ public class UpdaterListener implements ApplicationListener<ContextRefreshedEven
      */
     private Map<String,String> getScript(String version) {
         try {
-            URL url = ResourceUtils.getURL("classpath:script/sql");
+            URL url = ResourceUtils.getURL(defaultPath);
             File sqlDir = new File(url.getPath()).getCanonicalFile();
             File[] files = sqlDir.listFiles();
             List<File> fileList = Arrays.stream(files)
