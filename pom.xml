@@ -14,7 +14,6 @@
         <module>provider</module>
         <module>consumer</module>
         <module>hystrix-dashboard</module>
-        <module>starters</module>
     </modules>
 
     <parent>
