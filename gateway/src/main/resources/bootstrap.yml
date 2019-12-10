@@ -4,8 +4,20 @@ spring:
   cloud:
     # 服务注册
     nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml # Nacos 只支持 yaml 和 properties 后缀，此后缀不要改
+        group: test
+        refreshable-dataids: longxw-gateway
+        prefix: test
       discovery:
         server-addr: 127.0.0.1:8848
         register-enabled: true
+    gateway:
+      routes:
+        - id: consul-consumer
+          uri: lb://consul-consumer
+          predicates:
+            - Method=GET
 server:
   port: 9000
