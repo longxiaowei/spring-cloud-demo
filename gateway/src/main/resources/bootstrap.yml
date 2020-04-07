@@ -7,17 +7,31 @@ spring:
       config:
         server-addr: 127.0.0.1:8848
         file-extension: yaml # Nacos 只支持 yaml 和 properties 后缀，此后缀不要改
-        group: test
-        refreshable-dataids: longxw-gateway
-        prefix: test
+        #namespace: f0849218-1c3b-4b33-bd65-40fa7a500dad
+        #group: longxw-dev
       discovery:
         server-addr: 127.0.0.1:8848
         register-enabled: true
+        #namespace: f0849218-1c3b-4b33-bd65-40fa7a500dad
+        #group: longxw-dev
     gateway:
       routes:
-        - id: consul-consumer
-          uri: lb://consul-consumer
+        - id: mcube-dashboard
+          uri: lb://mcube-dashboard/dashboard/
           predicates:
-            - Method=GET
+            - Path=/dashboard/**
+          filters:
+            - AddRequestHeader=MCUBE_TENANT_CODE, mcube
+        - id: security
+          uri: lb://mcube-security/security/
+          predicates:
+            - Path=/security/**
+          filters:
+            - AddRequestHeader=MCUBE_TENANT_CODE, mcube
+      x-forwarded:
+        for-enabled: true   # 写入X-Forwarded-For
+        port-enabled: true  # 写入X-Forwarded-Proto
+        host-enabled: true  # 写入X-Forwarded-Port
+        proto-enabled: true # 写入X-Forwarded-Host
 server:
   port: 9000
